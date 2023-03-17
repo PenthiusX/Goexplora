@@ -19,14 +19,27 @@
     <div>
         <div id="mySidepanel" class="sidepanel">
             <a class="closebtn" onclick="closeNav()">×</a>
-            <select onClick={optionHtmlMarkup} id="optionId">
+            
+            <select onClick="shapeOptions()", id="optionId">
                 <option value="Sphere"> Sphere </option>
                 <option value="Cube"> Cube </option>
             </select>
-
-            <a href="#">Services</a>
-            <a href="#">Clients</a>
-            <a href="#">Contact</a>
+            <div> 
+                <a href="#">Position</a> 
+                <input type="text" id="positionVal">            
+            </div>
+            <div> 
+                <a href="#">Rotation</a> 
+                <input type="text" id="rotVal">    
+            </div>
+            <div> 
+                <a href="#">Scale</a> 
+                <input type="text" id="scaleVal">   
+            </div>
+            <div> 
+                <a href="#">Color</a> 
+                <input type="text" id="colorVal">   
+            </div>
         </div>
         
         <button class="openbtn" onclick="openNav()">></button>  
