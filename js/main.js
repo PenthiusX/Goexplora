@@ -5,7 +5,9 @@ adi.mInstance = adi.mInstance || {};
 var clock = new THREE.Clock();
 var textureLoader = new THREE.TextureLoader();
 
-init();
+
+initElements();
+initThree();
 animate();
 
 adi.mInstance.camera;
@@ -13,105 +15,113 @@ adi.mInstance.scene;
 adi.mInstance.render;
 adi.mInstance.sphere;
 adi.mInstance.floor;
-adi.mInstance.background;
-
 adi.mInstance.frametime;
 
 adi.mInstance.groundGeometry;
 adi.mInstance.groundMaterial;
 
-function init() //Start
-{
-    //
+adi.mInstance.hoverElementInfo;
+
+adi.mInstance.domContextR;
+adi.mInstance.domContextB;
+//---------------------------------------------------------------------------------
+//---------------------------------------------------------------------------------
+function initElements(){
+    
+}
+//---------------------------------------------------------------------------------
+const openNav = async() => { document.getElementById("mySidepanel").style.width = "250px";}
+//---------------------------------------------------------------------------------
+const closeNav = async() => {document.getElementById("mySidepanel").style.width = "0";}
+//---------------------------------------------------------------------------------
+//---------------------------------------------------------------------------------
+function elementFocusToggle(){
+    document.addEventListener('mousemove', function (e) {
+        if (e != null && e.target != null) {//Scan elements under mouse cursor.
+            adi.mInstance.hoverElementInfo = { element: e.target, posX: e.clientX, posY: e.clientY }
+            let ele = document.getElementsByClassName(adi.mInstance.hoverElementInfo.element.parentElement.className);
+            adi.mInstance.hoverElementInfo = { element: e.target, parent: ele, posX: e.clientX, posY: e.clientY }
+            console.log(adi.mInstance.hoverElementInfo);
+        }    
+
+        //Hack to allow for correct focus on overlaying Canvas and other Elements
+        //will toggle the z index for the canvas based on where the mouse position is.
+        let we = document.getElementById("Webgl_CSS_canvas");
+        if(we && adi.mInstance.hoverElementInfo.element.id == "body"){
+            we.style.zIndex = 0;
+        }
+        else if(we){
+            we.style.zIndex = -1;
+        }
+
+    },false);
+}
+
+//--------------------------------------
+function initThree() //Start
+{   
+    elementFocusToggle();
+    //Rendering Context
     adi.mInstance.render = new THREE.WebGLRenderer({
         alpha: true
     });
     //adi.mInstance.render.setPixelRatio(window.devicePixelRatio);
     adi.mInstance.render.setSize(window.innerWidth, window.innerHeight);
-    //adi.mInstance.render.setSize(400, 400);
     document.body.appendChild(adi.mInstance.render.domElement);
     adi.mInstance.render.domElement.id = "Webgl_CSS_canvas";
+    
+    //Camera
+    adi.mInstance.camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 1000);   
     //
-    adi.mInstance.camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 1000);
-    adi.mInstance.camera.position.set(5, 5, 220);
-    //
+    adi.mInstance.domContextR =  adi.mInstance.render.domElement;
+    adi.mInstance.domContextB =  document.body;
+
+    //Controls
+    const controls = new THREE.OrbitControls(adi.mInstance.camera, adi.mInstance.domContextR );
+    adi.mInstance.camera.position.set(5, 5, 220);    
+    
+    //Scene
     adi.mInstance.scene = new THREE.Scene();
-    //
+
     // GROUND
-    adi.mInstance.groundGeometry = new THREE.BoxBufferGeometry(150, 0.01, 150);
+    let pwidth = 10;
+    let pheight = 10; 
+    let pdepth = 10; 
+    let pwidthSegments = 5;
+    let pheightSegments= 5;
+    adi.mInstance.groundGeometry = new THREE.PlaneGeometry(pwidth, pheight, pwidthSegments,pheightSegments);
     adi.mInstance.groundMaterial = new THREE.MeshBasicMaterial({
         color: 'rgb(200,200,200)',
         wireframe: true
     });
     adi.mInstance.floor = new THREE.Mesh(adi.mInstance.groundGeometry, adi.mInstance.groundMaterial );
-    adi.mInstance.floor.position.y = -50.0;
+    adi.mInstance.floor.rotation.x = (Math.PI/2);
+    adi.mInstance.floor.scale.set(100,100,100);
+
+    adi.mInstance.floor.position.y = 0.0;
     adi.mInstance.scene.add(adi.mInstance.floor);
-    // Background
-    let material = new THREE.MeshPhongMaterial( );
-	let object = new THREE.Mesh( new THREE.PlaneBufferGeometry( 100, 100, 4, 4 ), material );
-				object.position.set( - 300, 0, 0 );
-                adi.mInstance.scene.add( object );
-    adi.mInstance.scene.add(adi.mInstance.sphere);
+
        //Scene Objects
-       adi.mInstance.sphere = new THREE.Mesh(new THREE.CylinderGeometry(20, 20, 100, 20),
+       let bwidth = 10;
+       let bheight = 10; 
+       let bdepth = 10; 
+       let bwidthSegments = 5;
+       let bheightSegments= 5;
+       let bdepthSegments = 5;
+       adi.mInstance.sphere = new THREE.Mesh(new THREE.BoxGeometry( bwidth, bheight, bdepth, bwidthSegments, bheightSegments, bdepthSegments),
        new THREE.MeshBasicMaterial({
            color: 'rgb(0,0,0)',
            wireframe: true
        }));
-   adi.mInstance.scene.add(adi.mInstance.sphere);
+       adi.mInstance.scene.add(adi.mInstance.sphere);
 }
-
-
-
-function twist(geometry) {
-    const quaternion = new THREE.Quaternion();
-  
-    for (let i = 0; i < geometry.attributes.position.array.length; i = i + 3) {
-      // a single vertex Y position
-      let p = new THREE.Vector3(geometry.attributes.position.array[i],geometry.attributes.position.array[i+1],geometry.attributes.position.array[i+2]);
-
-      const yPos = p.y;
-      const twistAmount = 10;
-      const upVec = new THREE.Vector3(0, 1, 0);
-  
-      quaternion.setFromAxisAngle(
-        upVec, 
-        (Math.PI / 180) * (yPos / twistAmount)
-      );
-        
-       p = p.applyQuaternion(quaternion);
-       geometry.attributes.position.array[i] = p.x;
-       geometry.attributes.position.array[i+1] = p.y;
-       geometry.attributes.position.array[i+2] = p.z;
-    }
-
-    // tells Three.js to re-render this mesh
-    geometry.verticesNeedUpdate = true;
-  }
-
-  adi.mInstance.counter = 0;
+//--------------------------------------
 function animate() //Update loop
 {
     requestAnimationFrame(animate);
-    frametime = clock.getDelta();
+    adi.mInstance.frametime = clock.getDelta();
     let time = clock.getElapsedTime();
-
-    adi.mInstance.groundGeometry.attributes.position.needsUpdate = true
-
-    // adi.mInstance.counter += 0.01;
-    // adi.mInstance.groundGeometry.attributes.position.array[0] = Math.sin(adi.mInstance.counter) * 2.5;
-    // adi.mInstance.groundGeometry.attributes.position.array[1] = Math.sin(adi.mInstance.counter) * 2.5;
-    // adi.mInstance.groundGeometry.attributes.position.array[2] = Math.sin(adi.mInstance.counter) * 2.5;
-    twist(adi.mInstance.groundGeometry);
-    adi.mInstance.floor = new THREE.Mesh(adi.mInstance.groundGeometry, adi.mInstance.groundMaterial);
-    console.log(adi.mInstance.groundGeometry.attributes.position.array[0],adi.mInstance.groundGeometry.attributes.position.array[1],adi.mInstance.groundGeometry.attributes.position.array[2]);
- 
-    // adi.mInstance.sphere.rotation.x += (Math.sin(time) * 3) * frametime;
-    // adi.mInstance.sphere.rotation.y += (Math.sin(time) * 3) * frametime;
-    // adi.mInstance.sphere.position.y = Math.abs(Math.sin(time) * 15);
-
-    // adi.mInstance.floor.rotation.y += 1.0 * frametime;
-
     let elapsed = clock.getElapsedTime();
+
     adi.mInstance.render.render(adi.mInstance.scene, adi.mInstance.camera);
 }

@@ -14,65 +14,6 @@ body
     overflow: hidden;
 }
 
-#branding h1:hover{
-    animation-name: branding;
-    animation-duration: 5s;
-    animation-iteration-count: infinite;
-}
-
-header
-{
-    padding-top: 30px;
-}
-
-header a
-{
-    text-decoration: none;
-    text-transform: uppercase;
-    font-size:16px;
-}
-
-header ul
-{
-    margin:10;
-    padding:10;
-}
-
-header li
-{
-    display:inline;
-    padding: 0 20px 0 20px;
-}
-
-header #branding
-{
-    text-align: center;
-    text-anchor: middle;
-    color: rgb(255, 255, 255);  
-}
-
-header #branding h1
-{
-    margin: 10;
-}
-
-header nav
-{
-    float:left;
-}
-
-footer
-{
-    background: rgb(130, 130, 130);
-    color: rgb(241, 241, 241);
-    padding-top: 30px;
-    min-height: 70px;
-    /* border-bottom: rgb(119, 119, 119) 3px solid; */
-    /* border-top: rgb(177, 177, 177) 3px solid; */
-
-    text-align: center;
-}
-
 #context 
 {
     width: 400px;
@@ -86,7 +27,7 @@ footer
 }
 
 /* The HTML element that is above the canvas. 
- Using this element canvas as the context for the webgl*/
+ Using this element canvas as the context for the Webgl FBO*/
 #Webgl_CSS_canvas
 {
   position: fixed;
@@ -94,8 +35,9 @@ footer
   left: 50%;
   /* bring your own prefixes */
   transform: translate(-50%, -50%);
-    z-index: -1;/*contolls the overlapping layers* html to webgl*/
+  z-index: 0;/*contolls the overlapping layers* html to webgl*/
 }
+/* Test */
 #Webgl_CSS_canvas1
 {
   position: fixed;
@@ -107,41 +49,63 @@ footer
   z-index: -1;/*contolls the overlapping layers* html to webgl*/
 }
 
-/* Borders */
-header #border
-{
-    background-color: rgb(130, 130, 130);
-    padding: 2px;
-}
-/* Animations */
-/* Standard syntax */
-@keyframes branding
-{
-    0%   {color:grey; left:0px; top:0px;}
-    25%  {color:rgb(138, 138, 138); left:200px; top:0px;}
-    50%  {color:rgb(243, 243, 243); left:200px; top:200px;}
-    75%  {color:rgb(43, 43, 43); left:0px; top:200px;}
-    100% {color:rgb(0, 0, 0); left:0px; top:0px;}
-}
+/*SidePannel CSS*/
+body {
+    font-family: "Lato", sans-serif;
+  }
 
-body #projects
-{
-    color: gray;
+  .sidepanel  {
+    width: 0;
+    position: fixed;
+    z-index: 1;
+    height: 250px;
+    top: 0;
+    left: 0;
+    background-color: #111;
+    overflow-x: hidden;
+    transition: 0.5s;
+    padding-top: 60px;
+    border-radius: 20px 20px;
+  }
+  
+  .sidepanel a {
+    padding: 8px 8px 8px 32px;
+    text-decoration: none;
+    font-size: 18px;
+    color: #818181;
+    display: block;
+    transition: 0.3s;
+  }
 
-}
-.pr1
-{
-    color: rgb(80, 41, 41);
-}
-.pr2
-{
-    color: rgb(66, 66, 114);
-}
-.pr3
-{
-    color: rgb(60, 128, 60);
-}
-.pr4
-{
-    color: rgb(145, 125, 62);
-}
+  .sidepanel select {
+    padding: 8px 8px 8px 32px;
+    text-decoration: none;
+    font-size: 18px;
+    color: #818181;
+    display: block;
+    transition: 0.3s;
+  }
+  
+  .sidepanel a:hover {
+    color: #f1f1f1;
+  }
+  
+  .sidepanel .closebtn {
+    position: absolute;
+    top: 0;
+    right: 25px;
+    font-size: 36px;
+  }
+  
+  .openbtn {
+    font-size: 20px;
+    cursor: pointer;
+    background-color: #111;
+    color: white;
+    padding: 10px 15px;
+    border: none;
+  }
+
+  .openbtn:hover {
+    background-color:#444;
+  }
