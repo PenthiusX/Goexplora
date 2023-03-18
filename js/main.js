@@ -12,7 +12,8 @@ onDocumentMouseDown();
 adi.mInstance.camera;
 adi.mInstance.scene;
 adi.mInstance.render;
-adi.mInstance.raycaster
+adi.mInstance.raycaster;
+adi.mInstance.transformControll;
 //
 adi.mInstance.mainmesh;
 adi.mInstance.floor;
@@ -68,7 +69,6 @@ function elementFocusToggle() {
 //---------------------------------------------------------------------------------
 async function onDocumentMouseDown (event) {
     if(event){
-
         //Hack to allow for correct focus on overlaying Canvas and other Elements
         //will toggle the z index for the canvas based on where the mouse position is.
         let we = document.getElementById("Webgl_CSS_canvas");
@@ -83,13 +83,13 @@ async function onDocumentMouseDown (event) {
         var mouse3D = new THREE.Vector3( ( event.clientX / window.innerWidth ) * 2 - 1,   
                                         -( event.clientY / window.innerHeight ) * 2 + 1,  
                                         0.5 );     
-    
-                                      
+                                    
             adi.mInstance.raycaster.setFromCamera( mouse3D.clone(), adi.mInstance.camera );
             var intersects = adi.mInstance.raycaster.intersectObjects( adi.mInstance.scene.children );
     
             if ( intersects.length > 0 ) {
-                intersects[ 0 ].object.material.color.setHex( Math.random() * 0xffffff );
+                intersects[0].object.material.color.setHex( Math.random() * 0xffffff );
+                adi.mInstance.transformControll.attach(intersects[0].object);
             }
     }
 }
@@ -108,41 +108,32 @@ function initThree() //Start
     adi.mInstance.render = new THREE.WebGLRenderer({
         alpha: true
     });
+     //Scene
+    adi.mInstance.scene = new THREE.Scene();
     //adi.mInstance.render.setPixelRatio(window.devicePixelRatio);
     adi.mInstance.render.setSize(window.innerWidth, window.innerHeight);
     document.body.appendChild(adi.mInstance.render.domElement);
-    adi.mInstance.render.domElement.id = "Webgl_CSS_canvas";
-    
+    adi.mInstance.render.domElement.id = "Webgl_CSS_canvas";   
     //Camera
     adi.mInstance.camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 1000);   
-    
-
-    //Controls
-    const controls = new THREE.OrbitControls(adi.mInstance.camera, adi.mInstance.render.domElement);
-    adi.mInstance.camera.position.set(5, 5, 220);    
-
+    //Raycaster
     adi.mInstance.raycaster = new THREE.Raycaster(); 
-    
-    //Scene
-    adi.mInstance.scene = new THREE.Scene();
-
-    // GROUND
-    let pwidth = 10;
-    let pheight = 10; 
-    let pdepth = 10; 
-    let pwidthSegments = 5;
-    let pheightSegments= 5;
-    adi.mInstance.groundGeometry = new THREE.PlaneGeometry(pwidth, pheight, pwidthSegments,pheightSegments);
-    adi.mInstance.groundMaterial = new THREE.MeshBasicMaterial({
-        color: 'rgb(200,200,200)',
-        wireframe: true
+    //Controls
+    const orbit = new THREE.OrbitControls(adi.mInstance.camera, adi.mInstance.render.domElement);
+    orbit.update();
+    orbit.addEventListener( 'change', adi.mInstance.render );
+    //
+    adi.mInstance.camera.position.set(5, 5, 220);    
+    //
+    adi.mInstance.transformControll = new THREE.TransformControls(adi.mInstance.camera,adi.mInstance.render.domElement );
+    adi.mInstance.transformControll.addEventListener( 'change',  adi.mInstance.render );
+    adi.mInstance.transformControll.addEventListener( 'dragging-changed', function ( event ) {
+        orbit.enabled = ! event.value;
     });
-    adi.mInstance.floor = new THREE.Mesh(adi.mInstance.groundGeometry, adi.mInstance.groundMaterial);
-    adi.mInstance.floor.rotation.x = (Math.PI/2);
-    adi.mInstance.floor.scale.set(100,100,100);
-
-    adi.mInstance.floor.position.y = 0.0;
-    adi.mInstance.scene.add(adi.mInstance.floor);
+    adi.mInstance.scene.add(adi.mInstance.transformControll);
+    
+    // GROUND
+    adi.mInstance.scene.add( new THREE.GridHelper( 1000, 10, 0x888888, 0x444444 ) );
 }
 //--------------------------------------
 function animate() //Update loop
