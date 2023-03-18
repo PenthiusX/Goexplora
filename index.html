@@ -31,24 +31,25 @@
             </div>
             <div> 
                 <a href="#">Position</a> 
-                <input type="text" id="positionVal">            
+                <input oninput="px(this)" type="text" id="positionValX" class = "inputBox"> <input oninput="py(this)" type="text" id="positionValY" class = "inputBox"><input oninput="pz(this)" type="text" id="positionValZ" class = "inputBox">               
             </div>
             <div> 
                 <a href="#">Rotation</a> 
-                <input type="text" id="rotVal">    
+                <input  oninput="rx(this)" type="text" id="rotValX" class = "inputBox"><input oninput="ry(this)" type="text" id="rotValY" class = "inputBox"><input  oninput="rz(this)" type="text" id="rotValZ" class = "inputBox">        
             </div>
             <div> 
                 <a href="#">Scale</a> 
-                <input type="text" id="scaleVal">   
+                <input oninput="sx(this)" type="text" id="scaleValX" class = "inputBox"><input oninput="sy(this)" type="text" id="scaleValY" class = "inputBox"><input oninput="sz(this)" type="text" id="scaleValZ" class = "inputBox">   
             </div>
             <div> 
                 <a href="#">Color</a> 
-                <input type="text" id="colorVal">   
+                <input oninput="cx(this)" type="text" id="colorValX" class = "inputBox"><input oninput="cy(this)" type="text" id="colorValY" class = "inputBox"><input oninput="cz(this)" type="text" id="colorValZ" class = "inputBox">   
             </div>
 
-            <br></br>
-            <button>Delete</button>
-
+            <div>
+            <br>
+            <button onclick="deleteObject()">Delete</button>
+            </div>
         </div>
         
         <button class="openbtn" onclick="openNav()">></button>  
