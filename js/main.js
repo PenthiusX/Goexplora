@@ -7,10 +7,12 @@ var textureLoader = new THREE.TextureLoader();
 //-----------------------------
 initThree();
 animate();
+onDocumentMouseDown();
 
 adi.mInstance.camera;
 adi.mInstance.scene;
 adi.mInstance.render;
+adi.mInstance.raycaster
 //
 adi.mInstance.mainmesh;
 adi.mInstance.floor;
@@ -22,6 +24,7 @@ adi.mInstance.groundMaterial;
 //
 adi.mInstance.hoverElementInfo;
 adi.mInstance.meshOption;
+adi.mInstance.addMesh = false;
 //---------------------------------------------------------------------------------
 //---------------------------------------------------------------------------------
 const shapeOptions = async (event) => {
@@ -31,13 +34,17 @@ const shapeOptions = async (event) => {
     }
 }
 //---------------------------------------------------------------------------------
-const openNav = async() => { 
+const addButtonPress = async (event) => {
+    adi.mInstance.addMesh = true;
+}
+//---------------------------------------------------------------------------------
+const openNav = async(event) => { 
     document.getElementById("mySidepanel").style.width = "250px";
     document.getElementById("mySidepanel").style.paddingLeft = "20px";
     document.getElementById("mySidepanel").style.paddingBottom = "100px";
 }
 //---------------------------------------------------------------------------------
-const closeNav = async() => {
+const closeNav = async(event) => {
     document.getElementById("mySidepanel").style.width = "0";
     document.getElementById("mySidepanel").style.paddingLeft = "0px";
     document.getElementById("mySidepanel").style.paddingBottom = "0px";
@@ -46,7 +53,7 @@ const closeNav = async() => {
 //Toogle focus based on Element detection 
 //Note : non optimal, looses focus intermittently
 //---------------------------------------------------------------------------------
-function elementFocusToggle(){
+function elementFocusToggle() {
     document.addEventListener('mousemove', function (e) {
         if (e != null && e.target != null) {//Scan elements under mouse cursor.
             adi.mInstance.hoverElementInfo = { element: e.target, posX: e.clientX, posY: e.clientY }
@@ -54,25 +61,49 @@ function elementFocusToggle(){
             adi.mInstance.hoverElementInfo = { element: e.target, parent: ele, posX: e.clientX, posY: e.clientY }
             // console.log(adi.mInstance.hoverElementInfo);
         }    
+    },false);
+}
+//---------------------------------------------------------------------------------
+// 
+//---------------------------------------------------------------------------------
+async function onDocumentMouseDown (event) {
+    if(event){
+
         //Hack to allow for correct focus on overlaying Canvas and other Elements
         //will toggle the z index for the canvas based on where the mouse position is.
         let we = document.getElementById("Webgl_CSS_canvas");
-        if(we && adi.mInstance.hoverElementInfo.element.id == "body"){
+        if(we && adi.mInstance.hoverElementInfo.element.id == "body") {
             we.style.zIndex = 0;
         }
-        else if(we && we.style.zIndex == 0){
+        else if(we && we.style.zIndex == 0) {
             we.style.zIndex = -1;
         }
 
-    },false);
+    //------
+        var mouse3D = new THREE.Vector3( ( event.clientX / window.innerWidth ) * 2 - 1,   
+                                        -( event.clientY / window.innerHeight ) * 2 + 1,  
+                                        0.5 );     
+    
+                                      
+            adi.mInstance.raycaster.setFromCamera( mouse3D.clone(), adi.mInstance.camera );
+            var intersects = adi.mInstance.raycaster.intersectObjects( adi.mInstance.scene.children );
+    
+            if ( intersects.length > 0 ) {
+                intersects[ 0 ].object.material.color.setHex( Math.random() * 0xffffff );
+            }
+    }
 }
-
-//--------------------------------------
+//---------------------------------------------------------------------------------
+function activateMouse() {
+    document.addEventListener( 'mousedown', onDocumentMouseDown );
+}
+//---------------------------------------------------------------------------------
 //Init the Three.js context.
-//--------------------------------------
+//---------------------------------------------------------------------------------
 function initThree() //Start
 {   
     elementFocusToggle();
+    activateMouse();
     //Rendering Context
     adi.mInstance.render = new THREE.WebGLRenderer({
         alpha: true
@@ -89,6 +120,8 @@ function initThree() //Start
     //Controls
     const controls = new THREE.OrbitControls(adi.mInstance.camera, adi.mInstance.render.domElement);
     adi.mInstance.camera.position.set(5, 5, 220);    
+
+    adi.mInstance.raycaster = new THREE.Raycaster(); 
     
     //Scene
     adi.mInstance.scene = new THREE.Scene();
@@ -110,13 +143,11 @@ function initThree() //Start
 
     adi.mInstance.floor.position.y = 0.0;
     adi.mInstance.scene.add(adi.mInstance.floor);
-
 }
 //--------------------------------------
 function animate() //Update loop
 {
-
-    if(adi.mInstance.meshOption  == "Sphere"){
+    if(adi.mInstance.meshOption == "Sphere" && adi.mInstance.addMesh){
         
         let radius = 10;
         let bwidthSegments = 10; 
@@ -124,18 +155,16 @@ function animate() //Update loop
             adi.mInstance.mainmesh = new THREE.Mesh(new THREE.SphereGeometry( radius, bwidthSegments, bheightSegments),
             new THREE.MeshBasicMaterial({
                 color: 'rgb(0.5,0.5,0.5)',
-                wireframe: false,
+                wireframe: true,
             }));
             
-            adi.mInstance.mainmesh.materials[0].transparent = true;
-            adi.mInstance.mainmesh.material[0].opacity = 1;
+            // adi.mInstance.mainmesh.materials[0].transparent = true;
+            // adi.mInstance.mainmesh.material[0].opacity = 1;
             
             adi.mInstance.scene.add(adi.mInstance.mainmesh);
-
-            adi.mInstance.meshOption = ""
     }
 
-    if(adi.mInstance.meshOption  == "Cube"){
+    if(adi.mInstance.meshOption  == "Cube" && adi.mInstance.addMesh){
         let bwidth = 10;
         let bheight = 10; 
         let bdepth = 10; 
@@ -145,16 +174,14 @@ function animate() //Update loop
         adi.mInstance.mainmesh = new THREE.Mesh(new THREE.BoxGeometry( bwidth, bheight, bdepth, bwidthSegments, bheightSegments, bdepthSegments),
         new THREE.MeshBasicMaterial({
             color: 'rgb(0.5,0.5,0.5)',
-            wireframe: false,
+            wireframe: true,
         }));
 
-        adi.mInstance.mainmesh.materials[0].transparent = true;
-        adi.mInstance.mainmesh.material[0].opacity = 1;
-
+        // adi.mInstance.mainmesh.materials[0].transparent = true;
+        // adi.mInstance.mainmesh.material[0].opacity = 1;
         adi.mInstance.scene.add(adi.mInstance.mainmesh);
-        adi.mInstance.meshOption = ""
    }
-
+   adi.mInstance.addMesh = false;
 
     requestAnimationFrame(animate);
     adi.mInstance.frametime = clock.getDelta();

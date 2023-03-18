@@ -19,11 +19,15 @@
     <div>
         <div id="mySidepanel" class="sidepanel">
             <a class="closebtn" onclick="closeNav()">×</a>
-            
-            <select onClick="shapeOptions()", id="optionId">
-                <option value="Sphere"> Sphere </option>
-                <option value="Cube"> Cube </option>
-            </select>
+            <div> 
+                <select onClick="shapeOptions()", id="optionId">
+                    <option value="Sphere"> Sphere </option>
+                    <option value="Cube"> Cube </option>
+                </select>
+            </div> 
+            <div id = "add-button" > 
+            <button onClick="addButtonPress()">+</button>
+            </div>
             <div> 
                 <a href="#">Position</a> 
                 <input type="text" id="positionVal">            
@@ -40,6 +44,10 @@
                 <a href="#">Color</a> 
                 <input type="text" id="colorVal">   
             </div>
+
+            <br></br>
+            <button>Delete</button>
+
         </div>
         
         <button class="openbtn" onclick="openNav()">></button>  

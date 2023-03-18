@@ -109,3 +109,8 @@ body {
   .openbtn:hover {
     background-color:#444;
   }
+
+  #add-button{
+    padding-left: 135px;
+    margin-top: -20px;
+  }
